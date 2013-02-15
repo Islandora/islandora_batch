@@ -48,6 +48,13 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
   }
 
   /**
+   * Allow the pattern to be set differently.
+   */
+  protected static function get_pattern() {
+    return '/.*/';
+  }
+
+  /**
    * Scan the directory with file_scan_directory().
    */
   protected function scan_directory($target) {
@@ -55,7 +62,7 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
     $target_components = explode(DIRECTORY_SEPARATOR, $target);
     $target = implode(DIRECTORY_SEPARATOR, $target_components);
     $target_length = strlen($target) + 1;
-    foreach (file_scan_directory($target, '/.*/') as $uri => $value) {
+    foreach (file_scan_directory($target, $this->get_pattern()) as $uri => $value) {
       $files[substr($uri, $target_length)] = $value;
     }
 
@@ -81,6 +88,8 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
       $path_info = pathinfo($name);
 
       // Avoid creating entries for directories and some weird Mac stuff...
+      // XXX: Should be made to take the pattern from
+      //   $this::get_pattern(), and to filter the results based on it.
       if (isset($path_info['extension']) && strpos($path_info['dirname'], '__MACOSX') === FALSE) {
         $file_entry = new stdClass();
         $file_entry->uri = "zip://$zip_file#$name";
