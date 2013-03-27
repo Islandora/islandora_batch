@@ -220,9 +220,9 @@ function islandora_batch_process_results($results, $timeout, &$context) {
         $context['message'] = t('Ingested %pid.', array('%pid' => $ingested_object->id));
       }
       else {
-        //  Failed to ingest...  Write back to the database, and say it's ready.
-        $object['data'] = serialize($ingest_object);
-        $object['state'] = ISLANDORA_BATCH_STATE__READY;
+        //  Failed to ingest...  Flag an error.
+        $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
+        $context['message'] = t('Failed to ingest %pid.', array('%pid' => $ingest_object->id));
       }
     }
 
@@ -241,6 +241,10 @@ function islandora_batch_process_results($results, $timeout, &$context) {
       ->execute();
 
     $end = timer_read(ISLANDORA_BATCH_TIMER_NAME);
+    if (!isset($context['results']['count']) {
+      $context['results']['count'] = $context['results']['sum'] = 0;
+    }
+
     $context['results']['count']++;
     $context['results']['sum'] += $end - $start;
     $average_time = islandora_batch_get_average($context);
