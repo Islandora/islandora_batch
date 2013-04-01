@@ -241,7 +241,7 @@ function islandora_batch_process_results($results, $timeout, &$context) {
       ->execute();
 
     $end = timer_read(ISLANDORA_BATCH_TIMER_NAME);
-    if (!isset($context['results']['count']) {
+    if (!isset($context['results']['count'])) {
       $context['results']['count'] = $context['results']['sum'] = 0;
     }
 

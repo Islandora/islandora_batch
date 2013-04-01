@@ -90,7 +90,7 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
       // Avoid creating entries for directories and some weird Mac stuff...
       // XXX: Should be made to take the pattern from
       //   $this::get_pattern(), and to filter the results based on it.
-      if (isset($path_info['extension']) && strpos($path_info['dirname'], '__MACOSX') === FALSE) {
+      if (isset($path_info['extension']) && strpos($path_info['dirname'], '__MACOSX') === FALSE && $path_info['extension'] != 'DS_Store') {
         $file_entry = new stdClass();
         $file_entry->uri = "zip://$zip_file#$name";
         $file_entry->filename = $path_info['basename'];
