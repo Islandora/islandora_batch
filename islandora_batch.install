@@ -59,7 +59,7 @@ function islandora_batch_schema() {
         'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
-        'unsigned' => TRUE,
+        'unsigned' => FALSE,
       ),
     ),
     'primary key' => array('id'),
@@ -120,3 +120,18 @@ function islandora_batch_schema() {
   return $schema;
 }
 
+/**
+ * Should have been done in the earlier commit introducing the error state.
+ */
+function islandora_batch_update_7100() {
+  db_change_field('islandora_batch_state', 'state', 'state',
+    array(
+      'description' => 'The state of the object.',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+      'unsigned' => FALSE,
+    )
+  );
+}
