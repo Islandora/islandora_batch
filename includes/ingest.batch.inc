@@ -213,16 +213,23 @@ function islandora_batch_process_results($results, $timeout, &$context) {
     }
 
     if ($object['state'] === ISLANDORA_BATCH_STATE__DONE) {
-      // Push to backend.
-      $ingested_object = islandora_add_object($ingest_object);
-      if ($ingested_object) {
-        $object['data'] = serialize($ingested_object);
-        $context['message'] = t('Ingested %pid.', array('%pid' => $ingested_object->id));
+      try {
+        // Push to backend.
+        $ingested_object = islandora_add_object($ingest_object);
+        if ($ingested_object) {
+          $object['data'] = serialize($ingested_object);
+          $context['message'] = t('Ingested %pid.', array('%pid' => $ingested_object->id));
+        }
+        else {
+          //  Failed to ingest...  Flag an error.
+          $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
+          $context['message'] = t('Unknown error: Failed to ingest %pid.', array('%pid' => $ingest_object->id));
+        }
       }
-      else {
+      catch (Exception $e) {
         //  Failed to ingest...  Flag an error.
         $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
-        $context['message'] = t('Failed to ingest %pid.', array('%pid' => $ingest_object->id));
+        $context['message'] = t('Exception occured: Failed to ingest %pid.', array('%pid' => $ingest_object->id));
       }
     }
 
