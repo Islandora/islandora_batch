@@ -27,7 +27,7 @@ function islandora_batch_ingest_preprocess($preprocessor, &$context) {
  *
  * @param array parameters
  *   An associative array of parameters to affect processing. Includes:
- *   - ingest_set: An array of IslandoraNewFedoraObjects to affect (Can
+ *   - ingest_set: An array of AbstractObjects to affect (Can
  *     instead be included as $context['results']['ingest_set']). This array of
  *     objects is used to limit the results when querying agains the queue.
  *   - timeout: An amount of time in seconds. If provided, we will only ingest

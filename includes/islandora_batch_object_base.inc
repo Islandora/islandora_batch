@@ -8,9 +8,9 @@
 /**
  * Batch interface.
  *
- * Implementing classes should subclass some version of FedoraObject, so 
+ * Implementing classes should subclass some version of AbstractObject, so 
  */
-abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
+abstract class IslandoraBatchObject extends IslandoraAbstractObject {
   /**
    * @return int
    *   Used to determine the initial state of the object in the queue.
