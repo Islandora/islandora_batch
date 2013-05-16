@@ -34,6 +34,9 @@ function islandora_batch_schema() {
       ),
     ),
     'primary key' => array('id'),
+    'indexes' => array(
+      'parent_index' => array('parent'),
+    ),
     'foreign keys' => array(
       'parent_entry' => array(
         'table' => 'islandora_batch_queue',
@@ -59,7 +62,7 @@ function islandora_batch_schema() {
         'size' => 'tiny',
         'not null' => TRUE,
         'default' => 0,
-        'unsigned' => TRUE,
+        'unsigned' => FALSE,
       ),
     ),
     'primary key' => array('id'),
@@ -120,3 +123,29 @@ function islandora_batch_schema() {
   return $schema;
 }
 
+/**
+ * Should have been done when introducing the "error" state
+ * https://github.com/discoverygarden/islandora_batch/pull/3, or
+ * https://github.com/discoverygarden/islandora_batch/pull/6 (where it actually
+ * started getting used, due to exceptions breaking things).
+ */
+function islandora_batch_update_7100() {
+  db_change_field('islandora_batch_state', 'state', 'state',
+    array(
+      'description' => 'The state of the object.',
+      'type' => 'int',
+      'size' => 'tiny',
+      'not null' => TRUE,
+      'default' => 0,
+      'unsigned' => FALSE,
+    )
+  );
+}
+
+/**
+ * Index the "parent" column in the islandora_batch_queue table, as it is used
+ * when determining which parent objects are available to be ingested.
+ */
+function islandora_batch_update_7101() {
+  db_add_index('islandora_batch_queue', 'parent_index', array('parent'));
+}

@@ -169,12 +169,18 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
   protected function preprocess_children(IslandoraBatchObject $object, $parent = NULL) {
     $to_return = array();
 
-    $object->add_relationships();
-    $this->add_to_database($object, $object->get_resources(), $parent);
-    $to_return[] = $object;
+    // XXX: Squash exceptions and log 'em.
+    try {
+      $object->add_relationships();
+      $this->add_to_database($object, $object->get_resources(), $parent);
+      $to_return[] = $object;
 
-    foreach ($object->get_children($this->connection) as $child) {
-      $to_return = array_merge($to_return, $this->preprocess_children($child, $object->id));
+      foreach ($object->get_children($this->connection) as $child) {
+        $to_return = array_merge($to_return, $this->preprocess_children($child, $object->id));
+      }
+    }
+    catch (Exception $e) {
+      watchdog_exception('islandora_batch', $e);
     }
 
     return $to_return;
@@ -262,6 +268,8 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
    *   An associative array of parameters, containing:
    *   - input: The input XML in a string.
    *   - xsl: The path to an XSLT file.
+   *   - php_functions: Either a string containing one or an array containing
+   *     any number of functions to register with the XSLT processor.
    *
    * @return string
    *   The transformed XML, as a string.
@@ -275,6 +283,10 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
 
     $processor = new XSLTProcessor();
     $processor->importStylesheet($xsl);
+
+    if (isset($info['php_functions'])) {
+      $processor->registerPHPFunctions($info['php_functions']);
+    }
 
     // XXX: Suppressing warnings regarding unregistered prefixes.
     return $processor->transformToXML($input);

@@ -4,10 +4,17 @@
  * @file
  * Abstract preprocessor base class for batch.
  */
+
+/**
+ * Lock exception.
+ */
 class IslandoraBatchFailedToLockException extends Exception {
 
 }
 
+/**
+ * Abstract preprocessor base class.
+ */
 abstract class IslandoraBatchPreprocessor {
 
   /**
@@ -57,9 +64,13 @@ abstract class IslandoraBatchPreprocessor {
    * @return string
    *   An id to use in the back-end (Fedora).
    */
-  protected function get_id($namespace = NULL) {
+  protected function get_id() {
     // Not specifying a namespace should result in one from the default
     //   declared in the fedora.fcfg ("changeme" by default).
+    $namespace = (isset($this->parameters['namespace'])) ?
+      $this->parameters['namespace'] :
+      NULL;
+
     // TODO: Implement some form of caching, so we can get multiple at a time.
     return $this->connection->repository->api->m->getNextPid($namespace);
   }
@@ -74,38 +85,34 @@ abstract class IslandoraBatchPreprocessor {
    * @param array $resources
    *   An associative array of arrays, mapping types of resources to an array
    *   of relevant resources for the given object.
-   *id
    * @return string
    *   The PID of the object (one will be allocated if the object does not
    *   already have one; otherwise, that on the object will be returned).
    */
   protected function add_to_database(AbstractFedoraObject $object, array $resources = array(), $parent = NULL) {
-    $namespace = (isset($this->parameters['namespace'])) ? $this->parameters['namespace'] : NULL;
     if (!isset($object->id)) {
-      $object->id = $this->get_id($namespace);
+      $object->id = $this->get_id();
     }
 
     db_insert('islandora_batch_queue')
-        ->fields(array('id', 'parent', 'data'))
-        // Could queue up multiple in a static cache, to dump all together?
-        ->values(array($object->id, $parent, serialize($object)))
-        ->execute();
+      ->fields(array('id', 'parent', 'data'))
+      // Could queue up multiple in a static cache, to dump all together?
+      ->values(array($object->id, $parent, serialize($object)))
+      ->execute();
     db_insert('islandora_batch_state')
-        ->fields(array('id', 'state'))
-        ->values(array($object->id, $object->initial_batch_state()))
-        ->execute();
+      ->fields(array('id', 'state'))
+      ->values(array($object->id, $object->initial_batch_state()))
+      ->execute();
 
     foreach ($resources as $type => $typed_resources) {
       foreach ($typed_resources as $resource) {
         db_insert('islandora_batch_resources')
-            ->fields(array('id', 'type', 'resource'))
-            ->values(array($object->id, $type, $resource))
-            ->execute();
+          ->fields(array('id', 'type', 'resource'))
+          ->values(array($object->id, $type, $resource))
+          ->execute();
       }
     }
 
     return $object->id;
   }
-
 }
-
