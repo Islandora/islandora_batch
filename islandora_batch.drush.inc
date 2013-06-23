@@ -63,6 +63,11 @@ function islandora_batch_drush_command() {
           'Defaults to "isMemberOfCollection".',
         'value' => 'optional',
       ),
+      'namespace' => array(
+        'description' => 'Namespace of objects to create. ' .
+          'Defaults to namespace specified in Fedora configuration.',
+        'value' => 'optional',
+      ),
     ),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
   );
@@ -89,6 +94,7 @@ function drush_islandora_batch_scan_preprocess() {
     'parent' => drush_get_option('parent', variable_get('islandora_repository_pid', 'islandora:root')),
     'parent_relationship_uri' => drush_get_option('parent_relationship_uri', 'info:fedora/fedora-system:def/relations-external#'),
     'parent_relationship_pred' => drush_get_option('parent_relationship_pred', 'isMemberOfCollection'),
+    'namespace' => drush_get_option('namespace'),
   );
 
   if ($content_models = drush_get_option('content_models', FALSE)) {
