@@ -13,6 +13,7 @@ define('ISLANDORA_BATCH_LOCK_TIMER', 'islandora_batch_lock_timer');
 // Ints indicating the state.
 define('ISLANDORA_BATCH_LOCK_TIMING', 0);
 define('ISLANDORA_BATCH_FINISHED_SET', 1);
+define('ISLANDORA_BATCH_EMPTY_SET', 2);
 
 function islandora_batch_get_average($context) {
   if ($context['results']['count'] > 0) {
@@ -55,18 +56,24 @@ function islandora_batch_ingest_process(array $parameters, &$context) {
   }
 
   if (!isset($timeout)) {
+    // XXX: Magic value (negative), causes the batch to run until all objects
+    // have been processed.
+    $timeout = -1.0;
+
     $max_exec = intval(ini_get('max_execution_time'));
     if ($max_exec > 0) {
       // max_execution_time could be 0 if run from CLI (drush?)
-      $timeout = $max_exec;
+      $lock_timeout = min(3600.0, $max_exec);
     }
     else {
       // Lock for an hour by default.
-      $timeout = 3600.0;
+      $lock_timeout = 3600.0;
     }
   }
+  else {
+    $lock_timeout = min(3600.0, $timeout);
+  }
 
-  $lock_timeout = min(3600.0, $timeout);
   $state = ISLANDORA_BATCH_FINISHED_SET;
 
   if (isset($context['results']['timer'])) {
@@ -77,33 +84,46 @@ function islandora_batch_ingest_process(array $parameters, &$context) {
 
   timer_start(ISLANDORA_BATCH_TIMER_NAME);
 
+  // Keep track of the states of each set.
+  $set_states = array();
+
   // Wait up to a third of our processing time to try to get the ingest lock.
-  if (lock_acquire(ISLANDORA_BATCH_LOCK_NAME, $lock_timeout) || (!lock_wait(ISLANDORA_BATCH_LOCK_NAME, $timeout / 3) && lock_acquire(ISLANDORA_BATCH_LOCK_NAME, $lock_timeout))) {
+  if (lock_acquire(ISLANDORA_BATCH_LOCK_NAME, $lock_timeout) ||
+    ((($timeout > 0) && !lock_wait(ISLANDORA_BATCH_LOCK_NAME, $timeout / 3) && lock_acquire(ISLANDORA_BATCH_LOCK_NAME, $lock_timeout))) ||
+    (!lock_wait(ISLANDORA_BATCH_LOCK_NAME, $lock_timeout / 3) && lock_acquire(ISLANDORA_BATCH_LOCK_NAME, $lock_timeout))) {
     timer_start(ISLANDORA_BATCH_LOCK_TIMER);
+
+
     // Try ingesting objects that are waiting for children, if all the children are ready.
     // Select all children which are NOT fully ingested.
-    $state = islandora_batch_process_results(islandora_batch_get_parents($ingest_set), $timeout, $lock_timeout, $context);
+    $set_states[] = $state = islandora_batch_process_results(islandora_batch_get_parents($ingest_set), $timeout, $lock_timeout, $context);
 
     // If the last part finished completely... (due to timeout, if it didn't).
-    if ($state === ISLANDORA_BATCH_FINISHED_SET) {
+    if (in_array($state, array(ISLANDORA_BATCH_FINISHED_SET, ISLANDORA_BATCH_EMPTY_SET), TRUE)) {
       // ... Continue processing.
-      $state = islandora_batch_process_results(islandora_batch_get_ready($ingest_set), $timeout, $lock_timeout, $context);
+      $set_states[] = $state = islandora_batch_process_results(islandora_batch_get_ready($ingest_set), $timeout, $lock_timeout, $context);
     }
 
-    if ($state === ISLANDORA_BATCH_FINISHED_SET) {
+    if (in_array($state, array(ISLANDORA_BATCH_FINISHED_SET, ISLANDORA_BATCH_EMPTY_SET), TRUE)) {
       // Attempt to process any parents which might now be ready to go, if we have any time left.
-      $state = islandora_batch_process_results(islandora_batch_get_parents($ingest_set), $timeout, $lock_timeout, $context);
+      $set_states[] = $state = islandora_batch_process_results(islandora_batch_get_parents($ingest_set), $timeout, $lock_timeout, $context);
     }
     timer_stop(ISLANDORA_BATCH_LOCK_TIMER);
   }
 
-  if (($state !== ISLANDORA_BATCH_FINISHED_SET) && isset($parameters['timeout']) && !islandora_batch_time_check(ISLANDORA_BATCH_TIMER_NAME, $timeout * 1000  / 3, $timeout)) {
+  // Attempting to process each set (parent/child/parent) returned each an
+  // empty set, so we're done.
+  $all_set_counts = array_count_values($set_states);
+  $all_sets_finished = isset($all_set_counts[ISLANDORA_BATCH_EMPTY_SET]) &&
+    $all_set_counts[ISLANDORA_BATCH_EMPTY_SET] === count($set_states);
+
+  if (!$all_sets_finished && isset($parameters['timeout']) && !islandora_batch_time_check(ISLANDORA_BATCH_TIMER_NAME, $timeout * 1000  / 3, $timeout)) {
     // If we're not completely finished but we're ingesting for a limited
     //   amount of time and we do not have enough time to try acquiring the
     //   lock again, inform the batch process so it stops.
     $context['finished'] = 1;
   }
-  elseif ($state === ISLANDORA_BATCH_FINISHED_SET) {
+  elseif ($all_sets_finished) {
     // We finished the queue of objects.
     $context['finished'] = 1;
   }
@@ -225,7 +245,7 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
   $average_time = -1;
 
   while ((
-      $average_time < 0 ||
+      $average_time < 0 || $timeout < 0 ||
       islandora_batch_time_check(ISLANDORA_BATCH_TIMER_NAME, $average_time, $timeout)
     ) &&
     ($object = $results->fetchAssoc()) &&
@@ -284,8 +304,13 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
     $average_time = islandora_batch_get_average($context);
   }
 
-  // $object should be "FALSE" if we finished this set of object.
-  if ($object === FALSE) {
+  if ($average_time < 0 && isset($object) && $object === FALSE) {
+    // Didn't get to process any object, because there was nothing to
+    // process... Possibly due to running out of total running time.
+    return ISLANDORA_BATCH_EMPTY_SET;
+  }
+  elseif ($object === FALSE) {
+    // $object should be "FALSE" if we finished this set of objects.
     return ISLANDORA_BATCH_FINISHED_SET;
   }
   elseif (!islandora_batch_time_check(ISLANDORA_BATCH_LOCK_TIMER, $lock_timeout * 1000 / 3, $lock_timeout)) {
