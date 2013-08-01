@@ -5,6 +5,10 @@
  * Abstract base class for objects ingested via batch framework.
  */
 
+// @codingStandardsIgnoreStart
+// This Whole file is ignored due to classes and methods are not camelcase and it
+// being called all over the place.  All of the other coding standards are met.
+
 /**
  * Batch interface.
  *
@@ -12,6 +16,8 @@
  */
 abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
   /**
+   * The initial batch state.
+   * 
    * @return int
    *   Used to determine the initial state of the object in the queue.
    *   - 0: Not ready to be processed.
@@ -37,7 +43,8 @@ abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
   /**
    * Get the resources to which we should link in the database.
    *
-   * Should be in the format used by IslandoraBatchPreprocessor::add_to_database().
+   * Should be in the format used by 
+   * IslandoraBatchPreprocessor::add_to_database().
    */
   abstract public function get_resources();
 
@@ -63,4 +70,4 @@ abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
    */
   abstract public function add_relationships();
 }
-
+// @codingStandardsIgnoreEnd

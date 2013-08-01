@@ -1,4 +1,14 @@
-Islandora Batch Ingest
+BUILD STATUS
+------------
+Current build status:
+[![Build Status](https://travis-ci.org/Islandora/islandora_batch.png?branch=7.x)](https://travis-ci.org/Islandora/islandora_batch)
+
+CI Server:
+http://jenkins.discoverygarden.ca
+
+
+ISLANDORA BATCH
+==================
 
 CONTENTS OF THIS FILE
 ---------------------

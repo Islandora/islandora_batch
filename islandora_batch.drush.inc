@@ -18,10 +18,10 @@ function islandora_batch_drush_command() {
     'options' => array(
       'timeout' => array(
         'description' => 'The max amount of time (in seconds) for which we ' .
-          'should process.  When the time is exceeded, the current object ' .
-          'will complete before terminating execution. If not provided, ' .
-          'should process until all available preprocessed objects are ' .
-          'exhausted.',
+        'should process.  When the time is exceeded, the current object ' .
+        'will complete before terminating execution. If not provided, ' .
+        'should process until all available preprocessed objects are ' .
+        'exhausted.',
         'value' => 'optional',
       ),
     ),
@@ -31,7 +31,7 @@ function islandora_batch_drush_command() {
   $items['islandora_batch_scan_preprocess'] = array(
     'aliases' => array('ibsp'),
     'description' => 'Preprocess assets by scanning either a directory or a ' .
-      'ZIP archive.',
+    'ZIP archive.',
     'drupal dependencies' => array('islandora_batch'),
     'options' => array(
       'type' => array(
@@ -44,28 +44,28 @@ function islandora_batch_drush_command() {
       ),
       'content_models' => array(
         'description' => 'A comma-separated list of content models to assign ' .
-          'to the objects.',
+        'to the objects.',
         'value' => 'optional',
-        //'required' => FALSE,
+        // 'required' => FALSE,
       ),
       'parent' => array(
         'description' => 'The collection to which the generated items should ' .
-          'be added. Defaults to the root Islandora repository PID.',
-        'value' => 'optional'
+        'be added. Defaults to the root Islandora repository PID.',
+        'value' => 'optional',
       ),
       'parent_relationship_uri' => array(
         'description' => 'The namespace URI of the relationship to the parent.' .
-          ' Defaults to "info:fedora/fedora-system:def/relations-external#".',
+        ' Defaults to "info:fedora/fedora-system:def/relations-external#".',
         'value' => 'optional',
       ),
       'parent_relationship_pred' => array(
         'description' => 'The predicate of the relationship to the parent. ' .
-          'Defaults to "isMemberOfCollection".',
+        'Defaults to "isMemberOfCollection".',
         'value' => 'optional',
       ),
       'namespace' => array(
         'description' => 'Namespace of objects to create. ' .
-          'Defaults to namespace specified in Fedora configuration.',
+        'Defaults to namespace specified in Fedora configuration.',
         'value' => 'optional',
       ),
     ),
@@ -76,7 +76,7 @@ function islandora_batch_drush_command() {
 }
 
 /**
- * Implements drush_hook_COMMAND().
+ * Implements hook_islandora_batch_scan_preprocess().
  *
  * Builds a preprocessor, and passes it off to a preprocessor handler.
  */
@@ -105,7 +105,7 @@ function drush_islandora_batch_scan_preprocess() {
   }
 
   // Could use a drush_multiple_choice() or whatever to get the list of
-  //   content models, if none were provided?
+  // content models, if none were provided?
   $preprocessor = new IslandoraScanBatch($connection, $parameters);
 
   // Pass the preprocessor off to run.
@@ -113,7 +113,7 @@ function drush_islandora_batch_scan_preprocess() {
 }
 
 /**
- * Implements drush_hook_COMMAND().
+ * Implements hook_islandora_batch_ingest().
  *
  * Ingests for the specified amount of time, if there is anything already
  * preprocessed.

@@ -8,6 +8,10 @@
  * or the old D6 zip batch ingester.
  */
 
+// @codingStandardsIgnoreStart
+// This Whole file is ignored due to classes and methods are not camelcase and it
+// being called all over the place.  All of the other coding standards are met.
+
 /**
  * A class which is capable of getting the listing of a directory or zip file.
  *
@@ -89,7 +93,7 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
 
       // Avoid creating entries for directories and some weird Mac stuff...
       // XXX: Should be made to take the pattern from
-      //   $this::get_pattern(), and to filter the results based on it.
+      // $this::get_pattern(), and to filter the results based on it.
       if (isset($path_info['extension']) && strpos($path_info['dirname'], '__MACOSX') === FALSE && $path_info['extension'] != 'DS_Store') {
         $file_entry = new stdClass();
         $file_entry->uri = "zip://$zip_file#$name";
@@ -116,7 +120,7 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
     $grouped = array();
 
     // TODO: Group according to basename, to and hand-off each group to object
-    //  wrappers.
+    // wrappers.
     foreach ($files as $uri => &$file_object) {
       $file_object->ext = pathinfo($file_object->filename, PATHINFO_EXTENSION);
       $grouped[$file_object->name][$file_object->ext] = $file_object;
@@ -155,8 +159,8 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
     foreach ($grouped as $base_name => $object_info) {
       $ingest_object = new $object_class($this->connection, $base_name, $object_info, $this->parameters);
 
-      // XXX: Might be better to have this actually handled as another "preprocessor",
-      //   so arbitrary "tree" structures might be built?
+      // XXX: Might be better to have this actually handled as another
+      // "preprocessor", so arbitrary "tree" structures might be built?
       $added = array_merge($added, $this->preprocess_children($ingest_object));
     }
 
@@ -190,6 +194,9 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
 class IslandoraScanBatchObject extends IslandoraBatchObject {
   protected $base_name, $object_info, $preprocessor_parameters;
 
+  /**
+   * Constructor for the IslandoraScanBatchObject.
+   */
   public function __construct(IslandoraTuque $connection, $base_name, $object_info, $preprocessor_parameters) {
     parent::__construct(NULL, $connection->repository);
 
@@ -199,6 +206,9 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
     $this->preprocessor_parameters = $preprocessor_parameters;
   }
 
+  /**
+   * Static Function to get mime.
+   */
   protected static function get_mime($file_object) {
     static $mime_detect = NULL;
     if ($mime_detect === NULL) {
@@ -208,6 +218,9 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
     return $mime_detect->getMimetype($file_object->filename);
   }
 
+  /**
+   * Function batch_process.
+   */
   public function batch_process() {
     // Use object_info to create some datastreams.
     $this->label = $this->get_title();
@@ -246,7 +259,7 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
    */
   protected function get_title() {
     if (!isset($this->label) || empty($this->label)) {
-      //  Acquire a title.
+      // Acquire a title.
       $mods = $this->get_mods();
       if ($mods) {
         $mods_doc = new DOMDocument();
@@ -292,6 +305,9 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
     return $processor->transformToXML($input);
   }
 
+  /**
+   * Function to get the mods.
+   */
   protected function get_mods() {
     if (!isset($this['MODS'])) {
       $dir = drupal_get_path('module', 'islandora_batch');
@@ -306,26 +322,26 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
 
         if ($xml) {
           $s_xml = new SimpleXMLElement($xml);
-      //   MODS, set
+          // MODS, set.
           if ($s_xml->getName() == 'mods') {
             // XXX: Should probably create a resource entry.
             $mods_datastream->setContentFromFile($this->object_info['xml']->uri, FALSE);
           }
-      //   MARCXML, transform to MODS and set
+          // MARCXML, transform to MODS and set.
           elseif ($s_xml->getName() == 'record') {
             $mods_datastream->content = static::run_xsl_transform(array(
               'input' => $xml,
               'xsl' => $dir . '/transforms/MARC21slim2MODS3-4.xsl',
             ));
           }
-      //   DC, transform to MODS and set
+          // DC, transform to MODS and set.
           elseif ($s_xml->getName() == 'dc') {
             $mods_datastream->content = static::run_xsl_transform(array(
               'input' => $xml,
               'xsl' => $dir . '/transforms/simpleDC2MODS.xsl',
             ));
           }
-      //   Unrecognized format...
+          // Unrecognized format...
           else {
             // Do nothing?
           }
@@ -335,7 +351,6 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
       // We use some Java code from LoC to transform binary MARC to MODS.
       if (!isset($mods_datastream->content) && isset($this->object_info['mrc'])) {
         // Generate some MODS from binary MARC.
-
         // Get the java executable.
         $java = variable_get('islandora_batch_java', 'java');
         $temp_file_marc = tempnam('/tmp', 'binmrc');
@@ -365,20 +380,19 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
           // Grab the first.
           $mods = new DOMDocument();
           $mods_node = $mods_docs->item(0);
-          $mods_node =  $mods->importNode($mods_node, TRUE);
+          $mods_node = $mods->importNode($mods_node, TRUE);
           $mods->appendChild($mods_node);
 
           // TODO: Transform dates to Solr format...  Or should this be left to
-          //   a core hook?
-
+          // a core hook?
           // And put the content into the datastream.
           $mods_datastream->content = $mods->saveXML();
         }
       }
 
       if (!isset($mods_datastream->content)) {
-      // If we do not yet have any XML, create a dumb MODS with just the
-      //   title, and set it...
+        // If we do not yet have any XML, create a dumb MODS with just the
+        // title, and set it...
         $title = $this->base_name;
 
         $mods_datastream->content = <<<EOXML
@@ -395,7 +409,9 @@ EOXML;
 
     return $this['MODS']->content;
   }
-
+  /**
+   * Function to get dc.
+   */
   protected function get_dc() {
     if (!isset($this['DC'])) {
       // TODO: Create the DC datastream on this object.
@@ -418,7 +434,7 @@ EOXML;
       // Get the DC by transforming from MODS.
       if (!isset($dc_datastream->content)) {
         // XXX: Might want to make this use a file, instead of staging the DC
-        //   in the database table (inside the object we serialize).
+        // in the database table (inside the object we serialize).
         $new_dc = static::run_xsl_transform(array(
           'xsl' => drupal_get_path('module', 'islandora_batch') . '/transforms/mods_to_dc.xsl',
           'input' => $this->get_mods(),
@@ -453,3 +469,4 @@ EOXML;
     $this->models = $this->preprocessor_parameters['content_models'];
   }
 }
+// @codingStandardsIgnoreEnd

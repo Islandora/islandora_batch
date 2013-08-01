@@ -22,7 +22,7 @@ function islandora_batch_schema() {
       ),
       'parent' => array(
         'description' => 'If applicable, the identifier (allocated) for the ' .
-          'parent object.',
+        'parent object.',
         'type' => 'varchar',
         'not null' => FALSE,
         'length' => 255,
@@ -124,6 +124,8 @@ function islandora_batch_schema() {
 }
 
 /**
+ * Function to update 7100.
+ * 
  * Should have been done when introducing the "error" state
  * https://github.com/discoverygarden/islandora_batch/pull/3, or
  * https://github.com/discoverygarden/islandora_batch/pull/6 (where it actually
@@ -143,6 +145,8 @@ function islandora_batch_update_7100() {
 }
 
 /**
+ * Function to update 7101.
+ * 
  * Index the "parent" column in the islandora_batch_queue table, as it is used
  * when determining which parent objects are available to be ingested.
  */
