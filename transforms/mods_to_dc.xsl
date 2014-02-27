@@ -41,9 +41,9 @@ Version 1.0	2007-05-04 Tracy Meehleib <tmee@loc.gov>
 	<xsl:strip-space elements="*"/>
 	<xsl:template match="/">
 		<xsl:for-each select="//mods:mods[1]">
-            <oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-                <xsl:apply-templates/>
-            </oai_dc:dc>
+			<oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+				<xsl:apply-templates/>
+			</oai_dc:dc>
 		</xsl:for-each>
 	</xsl:template>
 	
