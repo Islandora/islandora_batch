@@ -410,10 +410,10 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
         // XXX: Due to how the things currently work, the user name and
         // password hash gets serialized, so later changes to the password
         // can break things... Let's set the password again.
-        $username = $ingest_object->repository->connection->username;
+        $username = $ingest_object->repository->api->connection->username;
         $user = user_load_by_name($username);
-        if ($ingest_object->repository->connection->password != $user->pass) {
-          $ingest_object->repository->connection->password = $user->pass;
+        if ($ingest_object->repository->api->connection->password != $user->pass) {
+          $ingest_object->repository->api->connection->password = $user->pass;
         }
 
         // Push to backend.
