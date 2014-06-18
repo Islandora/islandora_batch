@@ -45,6 +45,14 @@ The queue of preprocessed items can then be processed:
 
 `drush -v --user=admin --uri=http://localhost islandora_batch_ingest`
 
+A fuller example, that preprocesses large image objects for inclusion in the collection with PID "yul:F0433", is:
+
+`drush -v --user=admin --uri=http://digital.library.yorku.ca islandora_batch_scan_preprocess --content_models=islandora:sp_large_image_cmodel --parent=yul:F0433 --parent_relationship_pred=isMemberOfCollection --type=directory --target=/tmp/batch_ingest`
+
+then, to ingest the queued objects:
+
+`drush -v --user=admin --uri=http://digital.library.yorku.ca islandora_batch_ingest`
+
 ### Customization
 
 Custom ingests can be written by [extending](http://github.com/Islandora/islandora_batch/wiki/How-To-Extend) any of the existing preprocessors and batch object implementations. Checkout the [example implemenation](http://github.com/Islandora/islandora_batch/wiki/Example-Implementation-Tutorial) for more details.
