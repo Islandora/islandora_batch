@@ -297,7 +297,7 @@ Version 1.0	2007-05-04 Tracy Meehleib <tmee@loc.gov>
 		<xsl:choose>
 			<xsl:when test="contains ('isbn issn uri doi lccn uri', $type)">
 				<dc:identifier>
-					<xsl:value-of select="$type"/>: <xsl:value-of select="."/>
+					<xsl:value-of select="$type"/>: <xsl:value-of select="."/>
 				</dc:identifier>
 			</xsl:when>
 			<xsl:otherwise>
