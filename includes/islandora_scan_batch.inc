@@ -101,7 +101,11 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
       if (isset($path_info['extension']) && strpos($path_info['dirname'], '__MACOSX') === FALSE && $path_info['extension'] != 'DS_Store') {
         $file_entry = new stdClass();
         $file_entry->uri = "zip://$zip_file#$name";
-        $file_entry->filename = $path_info['basename'];
+        // XXX: Convert the basename to prevent issues when calling drupal
+        // file_create_filename with a poorly encoded string.  Suppressing
+        // 'iconv(): Detected an illegal character in input string' from
+        // outputting.
+        $file_entry->filename = @iconv('UTF-8', 'UTF-8//IGNORE', $path_info['basename']);
         $file_entry->name = $path_info['filename'];
         $info[$name] = $file_entry;
       }
