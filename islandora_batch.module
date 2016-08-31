@@ -123,6 +123,27 @@ function islandora_batch_menu() {
     'type' => MENU_LOCAL_ACTION,
   );
 
+  $delete_set_object_base = array(
+    'page callback' => 'islandora_batch_delete_set_object_page_callback',
+    'access callback' => 'islandora_batch_set_access',
+    'file' => 'includes/menu.inc',
+    'title' => 'Delete ingested objects',
+  );
+  $items['islandora_batch/set/%/delete_object'] = $delete_set_object_base + array(
+    'page arguments' => array(2),
+    'access arguments' => array(2),
+  );
+  $items['islandora_batch/reports/queue/%islandora_batch_set/delete_object'] = $delete_set_object_base + array(
+    'page arguments' => array(3, FALSE),
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_ACTION,
+  );
+  $items['admin/reports/islandora_batch_queue/%islandora_batch_set/delete_object'] = $delete_set_object_base + array(
+    'page arguments' => array(3, TRUE),
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_ACTION,
+  );
+
   return $items;
 }
 

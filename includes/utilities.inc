@@ -205,3 +205,70 @@ function islandora_batch_scan_check_encoding($type, $encoding) {
     }
   }
 }
+
+/**
+ * Batch to delete objects ingested via a batch set.
+ *
+ * @param int $set_id
+ *   Batch set ID.
+ */
+function islandora_batch_batch_delete_ingested_object_in_set($set_id) {
+  module_load_include('inc', 'islandora_batch', 'includes/db');
+  $batch = array(
+    'title' => t('Delete ingested objects from set'),
+    'finished' => 'islandora_batch_batch_delete_ingested_object_in_set_finished',
+    'init_message' => t('Initializing...'),
+    'operations' => array(),
+    'progress_message' => t('Time elapsed: @elapsed.'),
+    'file' => drupal_get_path('module', 'islandora_batch') . '/includes/utilities.inc',
+  );
+
+  $items = islandora_batch_get_queued_items_for_set($set_id);
+  foreach ($items as $item_id) {
+    $batch['operations'][] = array('islandora_batch_batch_delete_ingested_object_in_set_operation', array('item_id' => $item_id));
+  }
+  batch_set($batch);
+}
+
+/**
+ * Batch operation to delete object ingested via batch.
+ *
+ * @param int $item_id
+ *   Batch item ID (object PID).
+ *
+ * @param array $context
+ *   Batch context.
+ */
+function islandora_batch_batch_delete_ingested_object_in_set_operation($item_id, &$context) {
+  $purge = FALSE;
+  if (!empty($item_id)) {
+    $object = islandora_object_load($item_id);
+    if ($object) {
+      if ($object->repository->purgeObject($object->id)) {
+        $context['results']['purged'][] = $item_id;
+      }
+      else {
+        $context['results']['purged_fail'][] = $item_id;
+      }
+    }
+  }
+}
+
+/**
+ * Finished function for deleting ingested objects.
+ *
+ * @param array $success
+ *   An array of success passed from the batch.
+ * @param array $results
+ *   An array of results passed from the batch.
+ * @param array $operations
+ *   An array of operations passed from the batch.
+ */
+function islandora_batch_batch_delete_ingested_object_in_set_finished($success, $results, $operations) {
+  if (isset($results['purged'])) {
+    drupal_set_message(t('Sucessfully deleted (@pids)', array('@pids' => implode(', ', $results['purged']))));
+  }
+  if (isset($results['purged_fail'])) {
+    drupal_set_message(t('Unsuccessfully deleted (@pids)', array('@pids' => implode(', ', $results['purged_fail']))), 'warning');
+  }
+}

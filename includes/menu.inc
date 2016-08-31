@@ -303,3 +303,44 @@ function islandora_batch_set_restart_batch_form_submit(&$form, &$form_state) {
     'ingest_set' => $id,
   ));
 }
+
+
+/**
+ * Page callback to delete ingested objects that belong to a set.
+ */
+function islandora_batch_delete_set_object_page_callback($id, $management = FALSE) {
+  return drupal_get_form('islandora_batch_set_delete_object_form', $id, $management);
+}
+
+/**
+ * Form building function to delete ingested objects.
+ */
+function islandora_batch_set_delete_object_form($form, &$form_state, $id, $management) {
+  form_load_include($form_state, 'inc', 'islandora_batch', 'includes/ingest.batch');
+  $lock_name = islandora_batch_get_lock_name($id);
+
+  $form['info'] = array(
+    '#type' => 'item',
+    '#markup' => t('This will delete ingested objects in set @set from the repository.', array(
+      '@set' => $id,
+    )),
+  );
+
+  return confirm_form(
+    $form,
+    t('Delete ingested objects in set "@set"?', array(
+      '@set' => $id,
+    )),
+    $management ? "admin/reports/islandora_batch_queue/$id" : "islandora_batch/reports/queue/$id"
+  );
+}
+
+/**
+ * Form submission callback to delete ingested objects.
+ */
+function islandora_batch_set_delete_object_form_submit(&$form, &$form_state) {
+  module_load_include('inc', 'islandora_batch', 'includes/utilities');
+  list($id, $management) = $form_state['build_info']['args'];
+  $form_state['redirect'] = array($management ? "admin/reports/islandora_batch_queue/$id" : "islandora_batch/reports/queue/$id");
+  islandora_batch_batch_delete_ingested_object_in_set($id);
+}

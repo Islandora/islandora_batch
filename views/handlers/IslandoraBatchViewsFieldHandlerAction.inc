@@ -248,6 +248,14 @@ class IslandoraBatchViewsFieldHandlerSetActions extends IslandoraBatchViewsField
         )),
         'query' => drupal_get_destination(),
       ),
+      array(
+        'title' => t('Delete ingested objects in set'),
+        'href' => format_string('!base/!set_id/delete_object', array(
+          '!base' => $this->actionBasePath(),
+          '!set_id' => $this->getSetId($values),
+        )),
+        'query' => drupal_get_destination(),
+      ),
     );
   }
 
