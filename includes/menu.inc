@@ -304,7 +304,6 @@ function islandora_batch_set_restart_batch_form_submit(&$form, &$form_state) {
   ));
 }
 
-
 /**
  * Page callback to delete ingested objects that belong to a set.
  */
@@ -317,7 +316,6 @@ function islandora_batch_delete_set_object_page_callback($id, $management = FALS
  */
 function islandora_batch_set_delete_object_form($form, &$form_state, $id, $management) {
   form_load_include($form_state, 'inc', 'islandora_batch', 'includes/ingest.batch');
-  $lock_name = islandora_batch_get_lock_name($id);
 
   $form['info'] = array(
     '#type' => 'item',
