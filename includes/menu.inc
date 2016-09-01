@@ -320,8 +320,8 @@ function islandora_batch_purge_set_object_form($form, &$form_state, $id, $manage
 
   $form['info'] = array(
     '#type' => 'item',
-    '#markup' => t("WARNING: THIS ACTION CAN NOT BE UNDONE. This will purge ingested objects in set @set from the repository. "
-      . "Any modifications to objects ingested from set @set will be lost. </br> This process does not remove the batch set or items from it.", array(
+    '#markup' => t('WARNING: THIS ACTION CAN NOT BE UNDONE. This will purge ingested objects in set @set from the repository. '
+      . 'Any modifications to objects ingested from set @set will be lost.</br>This process does not remove the batch set or items from it.', array(
       '@set' => $id,
     )),
   );
