@@ -94,17 +94,26 @@ function islandora_batch_batch_purge_object_in_set_finished($success, $results, 
     $purged_count = count($results['purged']);
     drupal_set_message(t('Purged @count @label.', array(
       '@count' => $purged_count,
-      '@label' => format_plural($purged_count, 'PID', 'PIDs'),
+      '@label' => format_plural($purged_count, 'object', 'objects'),
     )), 'warning');
+  }
+  else {
+    drupal_set_message('No objects were purged', 'warning');
   }
   if (isset($results['purged_fail'])) {
     $file_uri = drupal_tempnam('public://', 'batch-set-object-purge-fail-');
-    $path = drupal_realpath($file_uri);
-    file_put_contents($path, implode("\n", $results['purged_fail']));
+    $file = new stdClass();
+    $file->uri = $file_uri;
+    $file->filename = drupal_basename($file_uri);
+    $file->filemime = 'application/octet-stream';
+    $file->status = 0;
+    file_put_contents($file_uri, implode("\n", $results['purged_fail']));
+    file_save($file);
+
     $failed_count = count($results['purged_fail']);
     drupal_set_message(t('Failed to purge @count @label. Download report !link.', array(
       '@count' => $failed_count,
-      '@label' => format_plural($failed_count, 'PID', 'PIDs'),
+      '@label' => format_plural($failed_count, 'object', 'objects'),
       '!link' => l('here', file_create_url($file_uri)),
     )), 'warning');
 
