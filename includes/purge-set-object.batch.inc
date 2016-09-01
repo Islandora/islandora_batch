@@ -55,13 +55,13 @@ function islandora_batch_batch_purge_object_in_set_operation($set_id, &$context)
       return;
     }
   }
-  // Might be increased to avoid bootstrapping overhead.
+
   $slice_size = 30;
   $slice_stop = $sandbox['progress'] + $slice_size;
 
-  for (; $sandbox['progress'] < $slice_stop && $sandbox['progress'] < $sandbox['total']; $sandbox['progress']++) {
+  for ($i = $sandbox['progress']; $i < $slice_stop && $i < $sandbox['total']; $i++) {
     $purge = FALSE;
-    $item_id = $sandbox['items'][$sandbox['progress']];
+    $item_id = $sandbox['items'][$i];
     $object = islandora_object_load($item_id);
     if ($object) {
       if ($object->repository->purgeObject($object->id)) {
@@ -75,6 +75,7 @@ function islandora_batch_batch_purge_object_in_set_operation($set_id, &$context)
       $context['results']['purged_fail'][] = $item_id;
     }
   }
+  $sandbox['progress'] = $i;
   $context['finished'] = $sandbox['progress'] / $sandbox['total'];
 }
 
