@@ -57,9 +57,9 @@ function islandora_batch_batch_purge_object_in_set_operation($set_id, &$context)
   }
 
   $slice_size = 30;
-  $slice_stop = $sandbox['progress'] + $slice_size;
+  $slice_stop = min($sandbox['progress'] + $slice_size, $sandbox['total']);
 
-  for ($i = $sandbox['progress']; $i < $slice_stop && $i < $sandbox['total']; $i++) {
+  for ($i = $sandbox['progress']; $i < $slice_stop; $i++) {
     $purge = FALSE;
     $item_id = $sandbox['items'][$i];
     $object = islandora_object_load($item_id);
