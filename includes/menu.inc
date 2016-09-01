@@ -305,28 +305,52 @@ function islandora_batch_set_restart_batch_form_submit(&$form, &$form_state) {
 }
 
 /**
- * Page callback to delete ingested objects that belong to a set.
+ * Page callback to purge ingested objects that belong to a set.
  */
-function islandora_batch_delete_set_object_page_callback($id, $management = FALSE) {
-  return drupal_get_form('islandora_batch_set_delete_object_form', $id, $management);
+function islandora_batch_purge_set_object_page_callback($id, $management = FALSE) {
+  return drupal_get_form('islandora_batch_purge_set_object_form', $id, $management);
 }
 
 /**
- * Form building function to delete ingested objects.
+ * Form building function to purge ingested objects.
  */
-function islandora_batch_set_delete_object_form($form, &$form_state, $id, $management) {
+function islandora_batch_purge_set_object_form($form, &$form_state, $id, $management) {
   form_load_include($form_state, 'inc', 'islandora_batch', 'includes/ingest.batch');
+
+
+  $lock_name = islandora_batch_get_lock_name($id);
 
   $form['info'] = array(
     '#type' => 'item',
-    '#markup' => t('This will delete ingested objects in set @set from the repository.', array(
+    '#markup' => t('This will attempt to purge ingested objects in set @set from the repository.', array(
       '@set' => $id,
     )),
   );
 
+  $form['global_notice'] = array(
+    '#type' => 'item',
+    '#title' => t('Global batch ingest lock'),
+    '#markup' => lock_may_be_available(ISLANDORA_BATCH_LOCK_NAME) ? t('Available') : t('Locked'),
+    '#description' => t('If this is locked, there may be a general batch being run over all items in the queue (in which case we will have to wait until it completes), or it may be possible that another user has just started a batch (in which case reloading the page may show that it is now available).'),
+  );
+
+  $set_lock = lock_may_be_available($lock_name);
+  $form['set_notice'] = array(
+    '#type' => 'item',
+    '#title' => t('Set batch ingest lock'),
+    '#markup' => $set_lock ? t('Available') : t('Locked'),
+    '#description' => t('The lock for the current set, to prevent other entities from trying to process the same set of items concurrently.'),
+  );
+
+  $form['lock_info'] = array(
+    '#type' => 'item',
+    '#markup' => t('If the lock is not avaliable, the purge process will attempt to obtain one before proceeding.'),
+  );
+
+
   return confirm_form(
     $form,
-    t('Delete ingested objects in set "@set"?', array(
+    t('Purge ingested objects in set "@set"?', array(
       '@set' => $id,
     )),
     $management ? "admin/reports/islandora_batch_queue/$id" : "islandora_batch/reports/queue/$id"
@@ -336,9 +360,9 @@ function islandora_batch_set_delete_object_form($form, &$form_state, $id, $manag
 /**
  * Form submission callback to delete ingested objects.
  */
-function islandora_batch_set_delete_object_form_submit(&$form, &$form_state) {
-  module_load_include('inc', 'islandora_batch', 'includes/utilities');
+function islandora_batch_purge_set_object_form_submit(&$form, &$form_state) {
+  module_load_include('inc', 'islandora_batch', 'includes/purge-set-object.batch');
   list($id, $management) = $form_state['build_info']['args'];
   $form_state['redirect'] = array($management ? "admin/reports/islandora_batch_queue/$id" : "islandora_batch/reports/queue/$id");
-  islandora_batch_batch_delete_ingested_object_in_set($id);
+  islandora_batch_batch_purge_object_in_set($id);
 }
