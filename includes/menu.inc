@@ -316,13 +316,13 @@ function islandora_batch_purge_set_object_page_callback($id, $management = FALSE
  */
 function islandora_batch_purge_set_object_form($form, &$form_state, $id, $management) {
   form_load_include($form_state, 'inc', 'islandora_batch', 'includes/ingest.batch');
-
-
   $lock_name = islandora_batch_get_lock_name($id);
 
   $form['info'] = array(
     '#type' => 'item',
-    '#markup' => t('This will attempt to purge ingested objects in set @set from the repository.', array(
+    '#markup' => t("WARNING: THIS ACTION CAN NOT BE UNDONE. This will purge ingested objects in set @set from the repository. "
+      . "If you've made changes to objects in this set after the batch originally completed, "
+      . "they will be lost.", array(
       '@set' => $id,
     )),
   );
@@ -347,13 +347,14 @@ function islandora_batch_purge_set_object_form($form, &$form_state, $id, $manage
     '#markup' => t('If the lock is not avaliable, the purge process will attempt to obtain one before proceeding.'),
   );
 
-
   return confirm_form(
     $form,
     t('Purge ingested objects in set "@set"?', array(
       '@set' => $id,
     )),
-    $management ? "admin/reports/islandora_batch_queue/$id" : "islandora_batch/reports/queue/$id"
+    $management ? "admin/reports/islandora_batch_queue/$id" : "islandora_batch/reports/queue/$id",
+    NULL,
+    t('Purge objects from repository')
   );
 }
 
