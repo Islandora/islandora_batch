@@ -23,7 +23,7 @@ function islandora_batch_batch_purge_object_in_set($set_id) {
     'file' => drupal_get_path('module', 'islandora_batch') . '/includes/purge-set-object.batch.inc',
   );
 
-  $batch['operations'][] = array('islandora_batch_batch_purge_object_in_set_operation', array('set_id' => $set_id));
+  $batch['operations'][] = array('islandora_batch_batch_purge_object_in_set_operation', array($set_id));
   batch_set($batch);
 }
 
@@ -48,7 +48,6 @@ function islandora_batch_batch_purge_object_in_set_operation($set_id, &$context)
 
   if (!isset($sandbox['total'])) {
     $sandbox['items'] = islandora_batch_get_queued_items_for_set($set_id);
-    dd($sandbox['items'], 'all items');
     $sandbox['total'] = count($sandbox['items']);
     $sandbox['progress'] = 0;
     if ($sandbox['total'] === 0) {
@@ -114,7 +113,7 @@ function islandora_batch_batch_purge_object_in_set_finished($success, $results, 
     drupal_set_message(t('Failed to purge @count @label. Download report !link.', array(
       '@count' => $failed_count,
       '@label' => format_plural($failed_count, 'object', 'objects'),
-      '!link' => l('here', file_create_url($file_uri)),
+      '!link' => l(t('here'), file_create_url($file_uri)),
     )), 'warning');
 
 
