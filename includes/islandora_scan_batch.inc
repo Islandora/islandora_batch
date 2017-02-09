@@ -188,9 +188,20 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
       $object->addRelationships();
       $this->addToDatabase($object, $object->getResources(), $parent);
       $to_return[] = $object;
-
-      foreach ($object->getChildren($this->connection) as $child) {
-        $to_return = array_merge($to_return, $this->preprocessChildren($child, $object->id));
+      $children = $object->getChildren($this->connection);
+      $child_count = count($children);
+      if ($child_count > 0) {
+        if (isset($this->parameters['namespace'])) {
+          $namespace = $this->parameters['namespace'];
+        }
+        else {
+          $namespace = $this->determineNamespace($object);
+        }
+        $children_ids = $this->connection->repository->getNextIdentifier($namespace, NULL, $child_count);
+        foreach ($children_ids as $key => $id) {
+          $children[$key]->id = $id;
+          $this->preprocessChildren($children[$key], $object->id);
+        }
       }
     }
     catch (Exception $e) {
