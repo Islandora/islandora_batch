@@ -197,7 +197,7 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
         else {
           $namespace = $this->determineNamespace($object);
         }
-        $children_ids = $this->connection->repository->getNextIdentifier($namespace, NULL, $child_count);
+        $children_ids = (array) $this->connection->repository->getNextIdentifier($namespace, NULL, $child_count);
         foreach ($children_ids as $key => $id) {
           $children[$key]->id = $id;
           $this->preprocessChildren($children[$key], $object->id);
