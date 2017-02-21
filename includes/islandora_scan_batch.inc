@@ -198,9 +198,15 @@ class IslandoraScanBatch extends IslandoraBatchPreprocessor {
           $namespace = $this->determineNamespace($object);
         }
         $children_ids = (array) $this->connection->repository->getNextIdentifier($namespace, NULL, $child_count);
-        foreach ($children_ids as $key => $id) {
-          $children[$key]->id = $id;
-          $this->preprocessChildren($children[$key], $object->id);
+        foreach ($children as $child) {
+          $pid = array_shift($children_ids);
+          if ($pid !== NULL) {
+            $child->id = $pid;
+            $this->preprocessChildren($child, $object->id);
+          }
+          else {
+            throw new Exception(t('No PID was available to allocate for object.'));
+          }
         }
       }
     }
