@@ -262,6 +262,11 @@ function islandora_batch_ingest_process(array $parameters, &$context) {
       ($context['sandbox']['loops'] + 1) :
       1;
     $context['finished'] = 1.0 * $context['sandbox']['loops'] / ($context['sandbox']['loops'] + 1);
+    // This doesn't cause the job to be scheduled again,
+    // it just starts an infinite loop. So reset the timer.
+    if (isset($timers[ISLANDORA_BATCH_LOCK_TIMER])) {
+      unset($timers[ISLANDORA_BATCH_LOCK_TIMER]['time']);
+    }
   }
 
   $context['results']['timer'] = timer_stop(ISLANDORA_BATCH_TIMER_NAME);
