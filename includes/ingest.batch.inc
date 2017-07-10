@@ -404,7 +404,11 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
       $process_results = $ingest_object->batchProcess();
       $object['state'] = is_array($process_results) ? $process_results['state'] : $process_results;
     }
-
+    try {
+      $error_text = $ingest_object->label;
+    } catch (Exception $ex) {
+      $error_text = "[unable to get any information about the failed ingest object]";
+    }
     if ($object['state'] === ISLANDORA_BATCH_STATE__DONE) {
       try {
         // XXX: Due to how the things currently work, the user name and
@@ -420,22 +424,22 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
         $ingested_object = islandora_add_object($ingest_object);
         if ($ingested_object) {
           $object['data'] = serialize($ingested_object);
-          $context['message'] = t('Ingested %pid.', array('%pid' => $ingested_object->id));
+          $context['message'] = t("Ingested {$ingested_object->id}");
         }
         else {
           // Failed to ingest...  Flag an error.
           $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
-          $context['message'] = t('Unknown error: Failed to ingest %pid.', array('%pid' => $ingest_object->id));
+          $context['message'] = t("Unknown error: Failed to ingest {$error_text}");
         }
       }
       catch (Exception $e) {
         // Failed to ingest...  Flag an error.
         $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
-        $context['message'] = t('Exception occured: Failed to ingest %pid.', array('%pid' => $ingest_object->id));
+        $context['message'] = t("Exception occured: Failed to ingest {$error_text}");
       }
     }
     else {
-      $context['message'] = t('%pid not ready for ingest.', array('%pid' => $ingest_object->id));
+      $context['message'] = t("{$error_text} not ready for ingest.");
     }
 
     // Update the info in the database.
