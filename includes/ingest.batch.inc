@@ -405,9 +405,10 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
       $object['state'] = is_array($process_results) ? $process_results['state'] : $process_results;
     }
     try {
-      $error_text = $ingest_object->label;
-    } catch (Exception $ex) {
-      $error_text = "[unable to get any information about the failed ingest object]";
+      $object_title = $ingest_object->label;
+    }
+    catch (Exception $ex) {
+      $object_title = "[unable to get any information about the failed ingest object]";
     }
     if ($object['state'] === ISLANDORA_BATCH_STATE__DONE) {
       try {
@@ -424,22 +425,28 @@ function islandora_batch_process_results($results, $timeout, $lock_timeout, &$co
         $ingested_object = islandora_add_object($ingest_object);
         if ($ingested_object) {
           $object['data'] = serialize($ingested_object);
-          $context['message'] = t("Ingested {$ingested_object->id}");
+          $context['message'] = t('Ingested %pid.', array('%pid' => $ingested_object->id));
         }
         else {
           // Failed to ingest...  Flag an error.
           $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
-          $context['message'] = t("Unknown error: Failed to ingest {$error_text}");
+          $context['message'] = t('Unknown error: Failed to ingest %pid  Title: %object_title', array(
+            '%pid' => $ingested_object->id, '%object_title' => $object_title)
+            );
         }
       }
       catch (Exception $e) {
         // Failed to ingest...  Flag an error.
         $object['state'] = ISLANDORA_BATCH_STATE__ERROR;
-        $context['message'] = t("Exception occured: Failed to ingest {$error_text}");
+        $context['message'] = t('Exception occured: Failed to ingest %pid  Title: %object_title', array(
+          '%pid' => $ingested_object->id, '%object_title' => $object_title)
+          );
       }
     }
     else {
-      $context['message'] = t("{$error_text} not ready for ingest.");
+      $context['message'] = t('%pid not ready for ingest.  Title: %object_title', array(
+        '%pid' => $ingested_object->id, '%object_title' => $object_title)
+        );
     }
 
     // Update the info in the database.
