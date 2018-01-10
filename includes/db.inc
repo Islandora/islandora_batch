@@ -54,6 +54,7 @@ function islandora_batch_delete_set($set_id) {
       file_usage_delete($file, 'islandora_batch', 'islandora_batch_set', $set_id);
     }
   }
+  module_invoke_all('islandora_batch_batch_set_deleted', $set_id);
   return $deleted;
 }
 

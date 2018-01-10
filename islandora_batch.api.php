@@ -51,3 +51,15 @@ function hook_islandora_batch_object_processed($ingest_object, $state) {
     $message['result'] = $system->mail($message);
   }
 }
+
+/**
+ * Allow modules to respond to a batch set being deleted.
+ *
+ * @param int $set_id
+ *   The set ID of the batch set that was deleted.
+ */
+function hook_islandora_batch_batch_set_deleted($set_id) {
+  drupal_set_message(t('The set (@set_id) was deleted.', array(
+    '@set_id' => $set_id,
+  )));
+}
