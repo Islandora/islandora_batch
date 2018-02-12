@@ -2,3 +2,14 @@
   width: 34px;
   position: relative;
 }
+
+.islandora-batch-view-table td.views-field-actions .ctools-dropbutton-wrapper {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.islandora-batch-view-table td.views-field-actions {
+  width: 135px;
+  vertical-align: top
+}
