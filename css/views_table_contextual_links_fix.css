@@ -1,11 +1,12 @@
-.view-islandora-batch-queue .views-table {
+.views-table {
     display: table;
     width: 100%;
     max-width: 100%;
     table-layout: fixed;
 }
 
-.view-islandora-batch-queue .views-table td, .view-islandora-batch-queue .views-table th {
+.views-table td,
+.views-table th {
   word-wrap: break-word;
 }
 
