@@ -1,6 +1,12 @@
-.islandora-batch-view-table td.views-field-contextual-links .contextual-links-wrapper {
-  width: 34px;
-  position: relative;
+.view-islandora-batch-queue .views-table {
+    display: table;
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+}
+
+.view-islandora-batch-queue .views-table td, .view-islandora-batch-queue .views-table th {
+  word-wrap: break-word;
 }
 
 .islandora-batch-view-table td.views-field-actions .ctools-dropbutton-wrapper {
@@ -10,6 +16,5 @@
 }
 
 .islandora-batch-view-table td.views-field-actions {
-  width: 135px;
-  vertical-align: top
+  vertical-align: top;
 }
