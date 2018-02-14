@@ -60,8 +60,8 @@ abstract class IslandoraBatchViewsFieldHandlerActions extends views_handler_fiel
           "$views_module_path/css/views-admin.seven.css",
         ),
       ),
-      '#prefix' => '<span class="ctools-dropbutton-wrapper">',
-      '#suffix' => '</span>',
+      '#prefix' => '<div class="ctools-dropbutton-wrapper">',
+      '#suffix' => '</div>',
       '#theme' => 'links__ctools_dropbutton',
       '#links' => $this->getLinks($values),
     );
