@@ -11,5 +11,5 @@
 }
 
 td.views-field-actions .ctools-dropbutton-wrapper {
-  height: 20px;
+  min-height: 20px;
 }
