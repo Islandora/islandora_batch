@@ -23,7 +23,7 @@ Additionally, installing and enabling [Views](https://drupal.org/project/views)
 will allow additional reporting and management displays to be rendered.
 
 
-# Installation
+## Installation
 
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
 
@@ -37,7 +37,7 @@ You should make sure that the path to your java executable is correct.  Optional
 
 ## Documentation
 
-Further documentation for this module is available at [our wiki](https://wiki.duraspace.org/display/ISLANDORA/Islandora+Batch)
+Further documentation for this module is available at [our wiki](https://wiki.duraspace.org/display/ISLANDORA/Islandora+Batch).
 
 ### Usage
 
@@ -78,7 +78,7 @@ then, to ingest the queued objects:
 
 ### Customization
 
-Custom ingests can be written by [extending](http://github.com/Islandora/islandora_batch/wiki/How-To-Extend) any of the existing preprocessors and batch object implementations. Checkout the [example implemenation](http://github.com/Islandora/islandora_batch/wiki/Example-Implementation-Tutorial) for more details.
+Custom ingests can be written by [extending](https://github.com/Islandora/islandora_batch/wiki/How-To-Extend) any of the existing preprocessors and batch object implementations. Checkout the [example implemenation](https://github.com/Islandora/islandora_batch/wiki/Example-Implementation-Tutorial) for more details.
 
 ### Clearing the semaphore table
 
@@ -95,7 +95,7 @@ Having problems or solved a problem? Check out the Islandora google groups for a
 
 Current maintainers:
 
-* [Diego Pino](https://github.com/DiegoPino)
+* [Adam Vessey](https://github.com/adam-vessey)
 
 ## Development
 
