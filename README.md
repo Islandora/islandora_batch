@@ -17,6 +17,7 @@ The ingest is a two-step process:
 This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
+* [Islandora XML Forms](https://github.com/islandora/islandora_xml_forms)
 * [Tuque](https://github.com/islandora/tuque)
 
 Additionally, installing and enabling [Views](https://drupal.org/project/views)
