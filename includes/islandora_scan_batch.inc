@@ -233,7 +233,7 @@ class IslandoraScanBatchObject extends IslandoraBatchObject {
   public function __construct(IslandoraTuque $connection, $base_name, $object_info, $preprocessor_parameters) {
     parent::__construct(NULL, $connection->repository);
 
-    $this->modsToDcTransform = drupal_get_path('module', 'xml_forms') . '/builder/transforms/mods_to_dc.xsl';
+    $this->modsToDcTransform = drupal_get_path('module', 'islandora') . '/xml/transforms/mods_to_dc.xsl';
     $this->baseName = $base_name;
     $this->objectInfo = $object_info;
     $this->resources = array();
