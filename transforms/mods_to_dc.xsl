@@ -300,7 +300,7 @@
 				<xsl:variable name="unit" select="translate(@unit,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
 				<!-- ws 1.7 -->
 				<xsl:if test="@unit">
-					<xsl:value-of select="$unit"/>: 
+					<xsl:value-of select="$unit"/>: 
 				</xsl:if>
 				<xsl:value-of select="."/>
 			</dc:format>
@@ -325,10 +325,10 @@
 				<xsl:when test="@type">
 					<xsl:choose>
 						<xsl:when test="@type">
-							<xsl:value-of select="$type"/>: <xsl:value-of select="."/>
+							<xsl:value-of select="$type"/>: <xsl:value-of select="."/>
 						</xsl:when>
 						<xsl:when test="contains ('isbn issn uri doi lccn uri', $type)">
-							<xsl:value-of select="$type"/>: <xsl:value-of select="."/>
+							<xsl:value-of select="$type"/>: <xsl:value-of select="."/>
 						</xsl:when>
 					</xsl:choose>
 				</xsl:when>
