@@ -52,6 +52,7 @@
 	When the first subelement in a subject wrapper is topic, subject subelements are strung together in dc:subject with hyphens separating them
 	Some subject subelements, i.e., geographic, temporal, hierarchicalGeographic, and cartographics, are also parsed into dc:coverage
 	The subject subelement geographicCode is dropped in the transform
+
 -->
 
 	<xsl:output method="xml" indent="yes"/>
