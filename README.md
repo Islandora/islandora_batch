@@ -84,6 +84,16 @@ After successful ingest, if the Drupal batch sets are not automatically cleared 
 
 where the `--time` parameter is a Unix timestamp. This will delete sets that were marked completed before (i.e. older than) the given timestamp. For example, to calculate the timestamp for 24h ago, use `date +%s` from a unix terminal then subtract 86,400 seconds.
 
+#### Outputting the set id
+Currently the default behaviour of the `islandora_batch_scan_preprocess` command is to output the set id as `SetId: <set id>`.
+
+Now there is an optional flag `--output_set_id` which causes `islandora_batch_scan_preprocess` to **only** output the set id number.
+
+This behaviour is the same as [Islandora Book Batch](https://github.com/islandora/islandora_book_batch) and 
+[Islandora Newspaper Batch](https://github.com/islandora/islandora_newspaper_batch).
+
+The default behaviour (outputting with `SetId:` prefix) has been left alone to avoid backwards compatibility issues. 
+
 ### Customization
 
 Custom ingests can be written by [extending](https://github.com/Islandora/islandora_batch/wiki/How-To-Extend) any of the existing preprocessors and batch object implementations. Checkout the [example implemenation](https://github.com/Islandora/islandora_batch/wiki/Example-Implementation-Tutorial) for more details.
