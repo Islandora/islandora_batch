@@ -8,9 +8,10 @@
 /**
  * Batch interface.
  *
- * Implementing classes should subclass some version of FedoraObject, so
+ * Implementing classes should subclass some version of FedoraObject, so.
  */
 abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
+
   /**
    * The initial batch state.
    *
@@ -72,6 +73,34 @@ abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
   abstract public function addRelationships();
 
   /**
+   * The actual back-end action that is run after the batchProcess.
+   *
+   * Classes not overriding this will get objects pushed to the back-end.
+   * (ingested)
+   *
+   * @return AbstractObject|false
+   *   Either a newly ingested Abstract Object or false if failed.
+   */
+  public function batchRepositoryAction() {
+    if (!islandora_object_load($this->id)) {
+      return islandora_add_object($this);
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * A human readable short description of the repository action.
+   *
+   * @return string
+   *   Recomended value is a verb in past tense.
+   */
+  public function getRepositoryActionDescription() {
+    return "ingested";
+  }
+
+  /**
    * Get the ID of this object in the queue.
    *
    * Only valid to call after we've been added to the database, and before
@@ -92,6 +121,10 @@ abstract class IslandoraBatchObject extends IslandoraNewFedoraObject {
       )));
     }
   }
+
 }
 
+/**
+ * An Islandora Batch Exception Class.
+ */
 class IslandoraBatchNoIdException extends Exception {}
